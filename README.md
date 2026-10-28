@@ -39,6 +39,8 @@ Elegí un código distinto para cada comisión y encuentro. Ejemplo:
 
 Con menos de 25 respuestas aparece la advertencia de inestabilidad; con menos de tres no se dibujan resultados. El conteo incluye sólo particiones válidas y un registro por participante. Las consultas paginan de a 1000 filas.
 
+Después de la actividad, desplegá **Detalles técnicos** para conversar sobre el método: explica cómo las pilas se convierten en matrices y coordenadas, incluye un ejemplo numérico y una sección opcional de álgebra, y presenta la relación con el modelo circumplejo de Russell. El esquema teórico está rotulado como tal y las fuentes originales están enlazadas. Toda esta explicación queda dentro del panel plegable para que el grupo pueda proponer nombres para los ejes antes de leerla.
+
 ## Demo y exportación
 
 **Modo demo** genera 40 respuestas en el navegador y muestra **DATOS SIMULADOS** permanentemente. No guarda nada en Supabase y detiene las consultas en vivo. Al salir vuelve a los datos de la sesión. Conserva la pantalla de espera hasta que el docente elige mostrar resultados. Las posiciones inventadas para la simulación no intervienen en el análisis de respuestas reales.

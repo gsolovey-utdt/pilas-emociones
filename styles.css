@@ -753,6 +753,33 @@ select { background: var(--surface-2); border: 1px solid var(--border); color: v
 .technical-panel > summary { cursor: pointer; min-height: 48px; padding: 15px 18px; font-size: 16px; }
 .technical-body { padding: 8px 20px 20px; }
 .technical-body p { font-size: 16px; }
+.technical-body .method-section { padding: 22px 0; border-bottom: 1px solid var(--border); }
+.technical-body .method-section:last-child { border-bottom: 0; padding-bottom: 0; }
+.technical-body .method-section h2 { margin: 10px 0 20px; font-size: clamp(24px,2.2vw,31px); }
+.technical-body h3 { color: var(--text); font: 600 19px/1.45 'DM Sans',sans-serif; margin: 0 0 12px; }
+.technical-body .method-intro { color: #bec2d4; font-size: 18px; max-width: 1000px; }
+.technical-body strong { color: var(--text); }
+.technical-body code { color: #c9d9ff; font: 0.9em 'DM Mono',monospace; overflow-wrap: anywhere; }
+.technical-body .method-steps { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; list-style: none; margin: 24px 0; }
+.method-steps > li { padding: 22px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+.technical-body .method-steps p:last-child { margin-bottom: 0; }
+.technical-body .method-example { padding: 12px 14px; border-left: 2px solid var(--blue); background: var(--surface-2); border-radius: 4px; color: #bdc9e6; }
+.technical-body .method-note { border-left: 2px solid var(--gold); padding: 4px 16px; margin-bottom: 0; }
+.method-math { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin: 24px 0 8px; }
+.method-math > summary { cursor: pointer; padding: 16px 20px; color: var(--text); font-size: 17px; min-height: 48px; }
+.method-math-body { padding: 6px 22px 18px; max-width: 1120px; }
+.method-math-body h3 { margin-top: 24px; }
+.method-code { padding: 20px; margin: 16px 0; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: #c9d9ff; font: 16px/2 'DM Mono',monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+.technical-body .method-source { font-size: 14px; padding-top: 12px; }
+.circumplex-layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(320px,1fr); gap: 30px; align-items: center; }
+.circumplex-figure { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+.circumplex-figure svg { display: block; width: 100%; height: auto; }
+.circumplex-figure figcaption { text-align: center; color: var(--muted); font-size: 13px; line-height: 1.6; padding: 8px 8px 0; }
+.theory-ring { fill: none; stroke: #616b8b; stroke-width: 2; stroke-dasharray: 6 7; }
+.theory-axis { fill: none; stroke: #4a536e; stroke-width: 1.5; }
+.theory-pole { fill: #c4c9db; font: 17px 'DM Sans',sans-serif; }
+.theory-example { fill: var(--gold); font: 18px 'DM Sans',sans-serif; }
+.method-interpretation { margin: 24px 0 0; max-width: 1120px; }
 #eigenvalues { overflow-wrap: anywhere; font-size: 13px; }
 .heatmap-scroll { overflow: auto; max-height: 720px; }
 .heatmap-table { border-collapse: collapse; font: 12px 'DM Mono',monospace; }
@@ -798,6 +825,12 @@ select { background: var(--surface-2); border: 1px solid var(--border); color: v
   .view-tabs { width: 100%; justify-content: space-between; }
   .view-tabs button { font-size: 17px; padding: 9px 10px; }
   .profile-controls label { width: 100%; }
+  .technical-body { padding-right: 14px; padding-left: 14px; }
+  .technical-body .method-steps, .circumplex-layout { grid-template-columns: minmax(0,1fr); }
+  .method-steps > li { padding: 18px; }
+  .method-math-body { padding: 4px 16px 16px; }
+  .method-code { font-size: 14px; padding: 14px; }
+  .circumplex-figure { padding: 10px; }
 }
 @media (max-width: 380px) {
   .student-screen h1 { font-size: 2rem; }

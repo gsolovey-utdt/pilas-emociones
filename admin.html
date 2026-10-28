@@ -62,13 +62,85 @@
           <section id="view-criteria" role="tabpanel" aria-labelledby="tab-criteria" hidden><div class="view-heading"><h2>¿Con qué criterio agrupaste?</h2><button id="btn-criteria" class="btn btn-secondary btn-small" aria-expanded="false" aria-controls="criteria-list">Mostrar</button></div><div id="criteria-list" class="criteria-list" hidden></div></section>
         </div>
         <details id="technical" class="technical-panel"><summary>Detalles técnicos</summary>
-          <div class="technical-body"><p id="technical-n"></p>
-            <p>distancia = 1 − proporción de la clase que puso el par en el mismo grupo</p>
-            <p>familias: agrupamiento jerárquico con enlace promedio (UPGMA)</p>
-            <p>mapa: MDS clásico (Torgerson)</p>
-            <p>Proporción por eje = autovalor positivo / suma de autovalores positivos. Masa negativa = suma de los valores absolutos negativos / suma de los valores absolutos de todos los autovalores.</p>
-            <p id="negative-mass"></p><p id="eigenvalues" class="mono"></p>
-            <h2>Proporciones de co-ocurrencia</h2><div id="heatmap" class="heatmap-scroll"></div>
+          <div class="technical-body">
+            <section class="method-section" aria-labelledby="method-title">
+              <div class="eyebrow">De juicios humanos a una representación vectorial</div>
+              <h2 id="method-title">¿Cómo se construyó este mapa?</h2>
+              <p class="method-intro">La entrada del algoritmo son las pilas de la clase. Cada palabra es un objeto y cada respuesta aporta información sobre qué objetos se parecen. Con 17 palabras hay 136 pares distintos para comparar.</p>
+              <ol class="method-steps">
+                <li><h3>1. Convertir cada respuesta en pares</h3><p>Para cada persona armamos una matriz de 17 × 17: un 1 si dos palabras quedaron en la misma pila y un 0 si quedaron en pilas distintas. El número o el color que tenía cada pila resulta irrelevante para esta comparación.</p></li>
+                <li><h3>2. Promediar las coincidencias</h3><p>Promediamos esas matrices entre las respuestas válidas. El resultado, <code>P</code>, expresa qué proporción de la clase puso junto cada par. Cada participante tiene el mismo peso.</p><p class="method-example">Ejemplo inventado: si 30 de 40 personas juntaron miedo y ansiedad, <code>P = 30 / 40 = 0,75</code>.</p></li>
+                <li><h3>3. Pasar del parecido a la distancia</h3><p>Usamos <code>D[i,j] = 1 − P[i,j]</code>. En el ejemplo, <code>D = 0,25</code>. Dos palabras que siempre quedaron juntas tienen distancia 0; las que nunca quedaron juntas, distancia 1. La diagonal de <code>P</code> vale 1 y la de <code>D</code>, 0.</p></li>
+                <li><h3>4. Obtener coordenadas y familias</h3><p>El mapa usa <strong>MDS clásico</strong> para representar aproximadamente esas distancias en dos dimensiones. En paralelo, el árbol aplica <strong>UPGMA</strong> a la matriz <code>D</code> completa. El corte del árbol determina los colores del mapa.</p><p>Al cambiar la cantidad de familias, cambia el corte y el color de las palabras. Sus coordenadas permanecen iguales.</p></li>
+              </ol>
+              <p class="method-note">Mirá el puntito para leer la posición de una palabra. Los nombres se desplazan para evitar superposiciones y una línea los conecta con su punto. Ese ajuste visual conserva las coordenadas calculadas.</p>
+            </section>
+
+            <details class="method-math">
+              <summary>Para quienes quieren ver el álgebra</summary>
+              <div class="method-math-body">
+                <h3>De distancias a productos internos</h3>
+                <p>Primero elevamos cada distancia al cuadrado y centramos por filas y columnas. Obtenemos una matriz centrada, <code>B</code>, que se interpreta como una matriz de productos internos cuando las distancias son euclidianas.</p>
+                <pre class="method-code" aria-label="Fórmulas del escalamiento clásico">n = 17
+J = I − (1/n) · 11ᵀ
+B = −½ · J · (D ∘ D) · J
+B = V · Λ · Vᵀ
+X = V₂ · sqrt(Λ₂⁺)</pre>
+                <p><code>D ∘ D</code> indica el cuadrado de cada elemento; <code>J</code> es la matriz de centrado. Las columnas de <code>V</code> son autovectores y <code>Λ</code> contiene los autovalores, ordenados de mayor a menor. Conservamos los dos primeros ejes y usamos <code>sqrt(max(λ, 0))</code> para escalarlos.</p>
+                <p>La descomposición usa un algoritmo de <strong>Jacobi</strong> para matrices simétricas, escrito en JavaScript: aplica rotaciones sucesivas para anular elementos fuera de la diagonal. Todo el análisis se ejecuta en el navegador.</p>
+                <h3>Qué aproxima el método</h3>
+                <p>Si <code>D</code> contiene distancias euclidianas, <code>B</code> permite recuperar una configuración de puntos. Elegir dos ejes conserva sólo parte de su estructura. En esta actividad <code>D</code> puede ser no euclidiana y producir autovalores negativos; los informamos por separado.</p>
+                <p>El MDS clásico aproxima la matriz de productos internos mediante sus ejes principales. Este criterio se conoce como <em>strain</em> y difiere de minimizar directamente el error entre todas las distancias dibujadas y las originales.</p>
+                <h3>Cómo se arma el árbol</h3>
+                <p>Cada palabra empieza como una familia. En cada paso unimos las dos familias con menor distancia promedio entre todos sus pares de palabras: enlace promedio o <strong>UPGMA</strong>. El árbol usa las distancias originales completas, con información que puede haberse perdido en el mapa de dos ejes.</p>
+                <h3>Por qué el mapa puede girar</h3>
+                <p>Rotar o espejar todos los puntos conserva las distancias. Para fijar los signos de los ejes usamos alegría como ancla; después se aplican los giros y espejos que elijas. Si dos autovalores son muy parecidos, pequeñas variaciones en las respuestas todavía pueden cambiar la orientación.</p>
+                <p class="method-source">Referencia del método: <a href="https://doi.org/10.1007/BF02288916" target="_blank" rel="noopener">Torgerson (1952)</a>. Para contrastar la implementación, mirá la documentación de <a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/cmdscale.html" target="_blank" rel="noopener">cmdscale de R</a> y las funciones de <a href="analysis.js" target="_blank" rel="noopener">analysis.js</a>.</p>
+              </div>
+            </details>
+
+            <section class="method-section" aria-labelledby="circumplex-title">
+              <h2 id="circumplex-title">¿Qué relación tiene con el modelo circumplejo?</h2>
+              <div class="circumplex-layout">
+                <div>
+                  <p>El modelo circumplejo del afecto de <strong>Russell (1980)</strong> organiza estados alrededor de dos ejes: <strong>valencia</strong> (desagradable–agradable) y <strong>activación</strong> (baja–alta). Propone semejanzas graduales entre vecinos y contrastes entre posiciones opuestas.</p>
+                  <p>Ese trabajo también obtuvo un mapa a partir de agrupaciones de palabras. Esta actividad adapta esa idea con 17 palabras, una clasificación por persona y MDS clásico; el estudio original empleó otro protocolo y el procedimiento SSA-1. <a href="https://pdodds.w3.uvm.edu/research/papers/others/1980/russell1980a.pdf#page=7" target="_blank" rel="noopener">Leé el artículo original, pp. 1167–1168</a>.</p>
+                </div>
+                <figure class="circumplex-figure">
+                  <svg viewBox="0 0 640 400" role="img" aria-labelledby="theory-title theory-description">
+                    <title id="theory-title">Esquema conceptual del modelo circumplejo</title>
+                    <desc id="theory-description">Un círculo de referencia combina un eje horizontal de valencia desagradable a agradable y otro vertical de activación baja a alta. El dibujo es teórico y no representa las respuestas de la clase.</desc>
+                    <circle cx="320" cy="200" r="120" class="theory-ring"/>
+                    <path d="M 165 200 H 475 M 320 48 V 352" class="theory-axis"/>
+                    <text x="320" y="29" text-anchor="middle" class="theory-pole">Activación alta</text>
+                    <text x="320" y="383" text-anchor="middle" class="theory-pole">Activación baja</text>
+                    <text x="20" y="195" class="theory-pole">Desagradable</text>
+                    <text x="490" y="195" class="theory-pole">Agradable</text>
+                    <text x="422" y="106" text-anchor="middle" class="theory-example">entusiasmo</text>
+                    <text x="221" y="106" text-anchor="middle" class="theory-example">miedo</text>
+                    <text x="420" y="305" text-anchor="middle" class="theory-example">calma</text>
+                    <text x="221" y="305" text-anchor="middle" class="theory-example">tristeza</text>
+                  </svg>
+                  <figcaption>Esquema teórico orientativo. Las posiciones del mapa de la clase se calculan libremente.</figcaption>
+                </figure>
+              </div>
+              <div class="method-interpretation"><h3>Una comparación para hacer después de agrupar</h3>
+                <p>Buscá si el mapa de la clase admite interpretaciones parecidas. La app deja los ejes sin nombrar y calcula las posiciones a partir de las respuestas: no ajusta un círculo ni usa esas dos propiedades como entrada. Encontrar dos ejes útiles tampoco demuestra por sí solo una organización circular.</p>
+                <p>La tarea releva cómo la clase relaciona palabras. La lista elegida, el idioma, la cantidad de grupos por persona y el desacuerdo entre participantes pueden afectar el resultado. En el demo, las respuestas parten de coordenadas inventadas: su parecido con la teoría forma parte del diseño de la simulación.</p>
+              </div>
+            </section>
+
+            <section class="method-section" aria-labelledby="diagnostics-title">
+              <h2 id="diagnostics-title">Diagnóstico de esta sesión</h2>
+              <p id="technical-n"></p>
+              <p>distancia = 1 − proporción de la clase que puso el par en el mismo grupo</p>
+              <p>familias: agrupamiento jerárquico con enlace promedio (UPGMA)</p>
+              <p>mapa: MDS clásico (Torgerson)</p>
+              <p id="technical-fit"></p>
+              <p>Proporción por eje = autovalor positivo / suma de autovalores positivos. Estos porcentajes resumen la estructura geométrica positiva. Masa negativa = suma de los valores absolutos negativos / suma de los valores absolutos de todos los autovalores.</p>
+              <p id="negative-mass"></p><p id="eigenvalues" class="mono"></p>
+              <h3>Proporciones de co-ocurrencia</h3><div id="heatmap" class="heatmap-scroll"></div>
+            </section>
           </div>
         </details>
       </section>

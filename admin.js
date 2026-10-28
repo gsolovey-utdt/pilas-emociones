@@ -259,6 +259,7 @@
   function renderTechnical() {
     if (!result) return;
     el('technical-n').textContent = `n = ${rows.length}`;
+    el('technical-fit').textContent = `Los dos ejes del mapa conservan ${percent(result.mds.shares[0]+result.mds.shares[1])} de la suma de autovalores positivos. El árbol distingue ${k} familias con el corte elegido.`;
     el('negative-mass').textContent = `Masa de autovalores negativos: ${percent(result.mds.negativeMassShare)}`;
     el('eigenvalues').textContent = `Autovalores: ${result.mds.eigenvalues.map(v=>v.toFixed(6)).join(' · ')}`;
     const table = document.createElement('table'); table.className = 'heatmap-table';
