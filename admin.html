@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0d0e12">
+  <title>Proyector · Pilas de emociones · NyPE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="admin-page">
+  <main id="session-entry" class="card session-entry" hidden>
+    <div class="nype-header"><span class="nype-badge">NyPE</span><span class="eyebrow">Pilas de emociones</span></div>
+    <h1>Abrí una sesión</h1>
+    <form id="session-form"><label class="input-label" for="session-input">Código de la sesión</label>
+      <input id="session-input" type="text" required maxlength="100" autocomplete="off" placeholder="emo1-2s2026">
+      <button class="btn btn-primary" type="submit">Abrir sesión</button>
+    </form>
+  </main>
+  <div id="dashboard" class="admin-wrap" hidden>
+    <header class="projector-top">
+      <div class="projector-brand"><div class="nype-header"><span class="nype-badge">NyPE</span><span class="eyebrow">Panel de clase</span></div><h1>Pilas de emociones</h1></div>
+      <div class="session-meta"><span id="session-code" class="mono"></span><div><strong id="top-count">0</strong> <span>respuestas</span></div></div>
+      <div class="top-actions">
+        <button id="btn-freeze" class="btn btn-secondary btn-small">Congelar</button>
+        <button id="btn-reveal" class="btn btn-primary btn-small">Mostrar resultados</button>
+        <button id="btn-demo" class="btn btn-secondary btn-small" aria-pressed="false">Modo demo</button>
+        <button id="btn-export" class="btn btn-secondary btn-small">Exportar CSV</button>
+      </div>
+    </header>
+    <div id="demo-banner" class="demo-banner" role="status" hidden>DATOS SIMULADOS</div>
+    <div id="stability-warning" class="warning-banner" hidden>Con menos de 25 respuestas el mapa es inestable.</div>
+    <div id="connection-status" class="connection-status" role="status" aria-live="polite"></div>
+    <main>
+      <section id="waiting" class="waiting-layout" aria-label="Esperando respuestas">
+        <div class="waiting-count"><span class="eyebrow">Pilas de emociones</span><strong id="waiting-count">0</strong><span class="waiting-label">respuestas</span></div>
+        <div class="join-card"><div id="qrcode" aria-label="Código QR para participar"></div><a id="student-link" target="_blank" rel="noopener"></a></div>
+      </section>
+      <section id="results" hidden>
+        <div class="result-controls">
+          <div class="view-tabs" role="tablist" aria-label="Vistas de la clase">
+            <button id="tab-map" role="tab" aria-controls="view-map" aria-selected="true" tabindex="0" data-view="map">Mapa</button>
+            <button id="tab-tree" role="tab" aria-controls="view-tree" aria-selected="false" tabindex="-1" data-view="tree">Familias</button>
+            <button id="tab-profile" role="tab" aria-controls="view-profile" aria-selected="false" tabindex="-1" data-view="profile">Una palabra</button>
+            <button id="tab-criteria" role="tab" aria-controls="view-criteria" aria-selected="false" tabindex="-1" data-view="criteria">Criterios</button>
+          </div>
+          <div class="family-control"><label for="family-k"><strong id="family-count">5 familias</strong></label><input id="family-k" type="range" min="2" max="12" value="5" aria-label="Cantidad de familias"></div>
+        </div>
+        <p id="too-few" class="empty-results" hidden>Esperá al menos 3 respuestas para ver los resultados.</p>
+        <div id="analysis-views">
+          <section id="view-map" role="tabpanel" aria-labelledby="tab-map">
+            <div class="view-heading"><p class="map-legend">Cerca = la clase las puso juntas · Color = familia</p><div class="orientation-actions"><button id="mirror-x" class="btn btn-secondary btn-small">Espejar ↔</button><button id="mirror-y" class="btn btn-secondary btn-small">Espejar ↕</button><button id="rotate" class="btn btn-secondary btn-small">Rotar 90°</button></div></div>
+            <div class="map-layout"><div id="map-chart" class="map-chart"></div><aside class="axis-card"><h2>Cuánto de la estructura captura cada eje</h2><div id="axis-shares"></div><div id="map-families" class="family-legend"></div></aside></div>
+          </section>
+          <section id="view-tree" role="tabpanel" aria-labelledby="tab-tree" hidden><div id="tree-chart" class="tree-chart"></div><p id="tie-note" class="chart-note" hidden>Hay uniones a la misma altura. La línea marca ese nivel; los colores muestran las familias elegidas.</p></section>
+          <section id="view-profile" role="tabpanel" aria-labelledby="tab-profile" hidden>
+            <div class="profile-controls"><div id="quick-words" class="quick-words"><button class="btn btn-secondary btn-small" data-word="nostalgia">nostalgia</button><button class="btn btn-secondary btn-small" data-word="sorpresa">sorpresa</button><button class="btn btn-secondary btn-small" data-word="celos">celos</button></div><label for="profile-word">Elegí una palabra</label><select id="profile-word"></select></div>
+            <h2 id="profile-title"></h2><div id="profile-chart" class="profile-chart"></div>
+          </section>
+          <section id="view-criteria" role="tabpanel" aria-labelledby="tab-criteria" hidden><div class="view-heading"><h2>¿Con qué criterio agrupaste?</h2><button id="btn-criteria" class="btn btn-secondary btn-small" aria-expanded="false" aria-controls="criteria-list">Mostrar</button></div><div id="criteria-list" class="criteria-list" hidden></div></section>
+        </div>
+        <details id="technical" class="technical-panel"><summary>Detalles técnicos</summary>
+          <div class="technical-body"><p id="technical-n"></p>
+            <p>distancia = 1 − proporción de la clase que puso el par en el mismo grupo</p>
+            <p>familias: agrupamiento jerárquico con enlace promedio (UPGMA)</p>
+            <p>mapa: MDS clásico (Torgerson)</p>
+            <p>Proporción por eje = autovalor positivo / suma de autovalores positivos. Masa negativa = suma de los valores absolutos negativos / suma de los valores absolutos de todos los autovalores.</p>
+            <p id="negative-mass"></p><p id="eigenvalues" class="mono"></p>
+            <h2>Proporciones de co-ocurrencia</h2><div id="heatmap" class="heatmap-scroll"></div>
+          </div>
+        </details>
+      </section>
+    </main>
+    <footer class="projector-footer"><span>Guillermo Solovey · UTDT · 2026</span><span id="update-status">Actualizando cada 5 segundos</span></footer>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    const SUPABASE_URL = "https://irryksaoygdklwtsjsru.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_9zF3s9-hDyRRVi5OqAFP-w_z9Mrx9bt";
+  </script>
+  <script src="analysis.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

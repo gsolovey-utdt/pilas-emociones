@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0d0e12">
+  <title>Pilas de emociones · NyPE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="student-page">
+  <main class="student-wrap">
+    <section id="screen-missing" class="student-screen" hidden><p>Pedile el link a tu docente.</p></section>
+    <section id="screen-loading" class="student-screen" hidden><p role="status">Cargando…</p></section>
+    <section id="screen-welcome" class="student-screen card" hidden aria-labelledby="welcome-title">
+      <div class="nype-header"><span class="nype-badge">NyPE</span><span class="nype-sub">Neurociencia y Psicología Experimental</span></div>
+      <div class="eyebrow">Pilas de emociones · UTDT</div>
+      <h1 id="welcome-title">Agrupá las emociones</h1>
+      <div class="pile-art" aria-hidden="true"><span>alegría</span><span>sorpresa</span><span>calma</span></div>
+      <p class="welcome-copy">Vas a ver 17 emociones. Agrupá las que te parecen parecidas. ‘Parecidas’ quiere decir lo que vos decidas: no hay respuestas correctas. Podés armar entre 2 y 6 grupos.</p>
+      <button id="btn-start" class="btn btn-primary">Empezar</button>
+      <p class="privacy-note">Tu respuesta es anónima. No escribas nombres ni datos personales.</p>
+    </section>
+    <section id="screen-sort" class="student-screen" hidden aria-labelledby="sort-title">
+      <header class="sort-header">
+        <div class="nype-header"><span class="nype-badge">NyPE</span><span class="eyebrow">Pilas de emociones</span></div>
+        <h1 id="sort-title">Agrupá las emociones</h1>
+        <p class="tap-help">Tocá una emoción y después tocá el grupo donde la querés poner.</p>
+      </header>
+      <section class="pool-card" aria-label="Lista de emociones">
+        <div class="section-heading"><h2>Emociones por ubicar</h2><span id="pool-count" class="mono"></span></div>
+        <div id="word-pool" class="word-list"></div>
+        <button id="btn-to-pool" class="btn btn-secondary" disabled>Volver a la lista</button>
+      </section>
+      <div class="groups-heading"><h2>Tus grupos</h2><button id="btn-add" class="btn btn-secondary btn-small">+ Nuevo grupo</button></div>
+      <p class="group-note">Los números de los grupos no significan nada.</p>
+      <div id="groups" class="groups-grid"></div>
+      <div class="sort-footer">
+        <p id="remaining" role="status" aria-live="polite"></p>
+        <p id="selection-status" class="selection-status" role="status" aria-live="polite">Tocá una emoción para seleccionarla.</p>
+        <button id="btn-done" class="btn btn-primary" disabled>Listo</button>
+      </div>
+    </section>
+    <section id="screen-criterion" class="student-screen card" hidden aria-labelledby="criterion-title">
+      <div class="nype-header"><span class="nype-badge">NyPE</span><span class="eyebrow">Un último paso</span></div>
+      <h1 id="criterion-title">¿Con qué criterio agrupaste? Contalo en pocas palabras.</h1>
+      <form id="criterion-form">
+        <label for="criterion" class="input-label">Tu criterio</label>
+        <input id="criterion" type="text" minlength="2" maxlength="120" required autocomplete="off" aria-describedby="criterion-help">
+        <p id="criterion-help">Entre 2 y 120 caracteres. No escribas nombres ni datos personales.</p>
+        <button id="btn-send" class="btn btn-primary" type="submit" disabled>Enviar</button>
+        <button id="btn-back" class="btn btn-secondary" type="button">Volver a mis grupos</button>
+      </form>
+    </section>
+    <section id="screen-sent" class="student-screen card sent-card" hidden aria-labelledby="sent-title">
+      <div class="nype-header"><span class="nype-badge">NyPE</span><span class="eyebrow">Pilas de emociones</span></div>
+      <div id="sent-icon" class="sent-icon" aria-hidden="true">✓</div>
+      <h1 id="sent-title" role="status" aria-live="polite">¡Listo! Mirá el proyector.</h1>
+      <p id="send-note"></p>
+      <button id="btn-retry" class="btn btn-primary" hidden>Reintentar</button>
+    </section>
+    <p id="storage-note" class="notice" role="alert" hidden>Habilitá el almacenamiento del navegador para poder guardar tu respuesta y reintentar si se corta la conexión.</p>
+    <noscript><p>Habilitá JavaScript para participar.</p></noscript>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script>
+    const SUPABASE_URL = "https://irryksaoygdklwtsjsru.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_9zF3s9-hDyRRVi5OqAFP-w_z9Mrx9bt";
+  </script>
+  <script src="analysis.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

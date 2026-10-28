@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pruebas · Pilas de emociones · NyPE</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body><main class="test-wrap card"><span class="nype-badge">NyPE</span><h1>Pruebas de Pilas de emociones</h1>
+  <p id="test-summary" role="status">Ejecutando…</p><ol id="test-results" class="test-list"></ol>
+  <button id="rerun" class="btn btn-secondary">Volver a ejecutar</button>
+</main>
+<script src="analysis.js"></script>
+<script src="tests.js"></script>
+<script>
+  function run() {
+    const results = runAnalysisTests(PilasAnalysis);
+    document.getElementById('test-results').replaceChildren(...results.map(result => {
+      const li = document.createElement('li'); li.className = result.pass ? 'test-pass' : 'test-fail';
+      li.textContent = `${result.pass ? 'PASS' : 'FAIL'} · ${result.name}${result.error ? ': '+result.error : ''}`;
+      return li;
+    }));
+    const passed = results.filter(result=>result.pass).length;
+    document.getElementById('test-summary').textContent = `${passed} / ${results.length} pruebas aprobadas`;
+    document.documentElement.dataset.tests = passed === results.length ? 'pass' : 'fail';
+  }
+  document.getElementById('rerun').addEventListener('click',run); run();
+</script>
+</body></html>
