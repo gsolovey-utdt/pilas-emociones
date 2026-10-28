@@ -27,20 +27,24 @@
       <header class="sort-header">
         <div class="nype-header"><span class="nype-badge">NyPE</span><span class="eyebrow">Pilas de emociones</span></div>
         <h1 id="sort-title">Agrupá las emociones</h1>
-        <p class="tap-help">Tocá una emoción y después tocá el grupo donde la querés poner.</p>
+        <p class="tap-help">Tocá una emoción y después un grupo.</p>
       </header>
-      <section class="pool-card" aria-label="Lista de emociones">
-        <div class="section-heading"><h2>Emociones por ubicar</h2><span id="pool-count" class="mono"></span></div>
-        <div id="word-pool" class="word-list"></div>
-        <button id="btn-to-pool" class="btn btn-secondary" disabled>Volver a la lista</button>
-      </section>
-      <div class="groups-heading"><h2>Tus grupos</h2><button id="btn-add" class="btn btn-secondary btn-small">+ Nuevo grupo</button></div>
-      <p class="group-note">Los números de los grupos no significan nada.</p>
-      <div id="groups" class="groups-grid"></div>
+      <div class="sort-workspace">
+        <section class="pool-card" aria-labelledby="pool-title">
+          <div class="section-heading"><h2 id="pool-title">Emociones por ubicar</h2><span id="pool-count" class="mono"></span></div>
+          <div id="word-pool" class="word-list"></div>
+        </section>
+        <section class="groups-panel" aria-labelledby="groups-title">
+          <div class="groups-heading"><h2 id="groups-title">Tus grupos</h2><button id="btn-add" class="btn btn-secondary btn-small">+ Nuevo grupo</button></div>
+          <p class="group-note">Los números de los grupos no significan nada.</p>
+          <div id="groups" class="groups-grid"></div>
+        </section>
+      </div>
       <div class="sort-footer">
-        <p id="remaining" role="status" aria-live="polite"></p>
-        <p id="selection-status" class="selection-status" role="status" aria-live="polite">Tocá una emoción para seleccionarla.</p>
-        <button id="btn-done" class="btn btn-primary" disabled>Listo</button>
+        <div class="sort-progress"><p id="remaining" role="status" aria-live="polite"></p>
+          <p id="selection-status" class="selection-status" role="status" aria-live="polite">Tocá una emoción para seleccionarla.</p></div>
+        <div class="sort-actions"><button id="btn-to-pool" class="btn btn-secondary" disabled>Volver a la lista</button>
+          <button id="btn-done" class="btn btn-primary" disabled>Listo</button></div>
       </div>
     </section>
     <section id="screen-criterion" class="student-screen card" hidden aria-labelledby="criterion-title">

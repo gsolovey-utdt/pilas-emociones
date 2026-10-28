@@ -6,6 +6,7 @@
   const sessionCode = (new URLSearchParams(location.search).get('s') || '').trim();
   const prefix = `pilas:${sessionCode}:`;
   let db = null, participantId, draft, selected = null, sending = false;
+  let viewedGroup = null, renderedSource = null, wasCompact = null;
   let storageOK = true;
   const storage = {
     get(name) { try { return JSON.parse(localStorage.getItem(prefix+name)); } catch (_) { return null; } },
@@ -22,6 +23,8 @@
   }
   function showScreen(name) {
     document.querySelectorAll('.student-screen').forEach(s => { s.hidden = s.id !== `screen-${name}`; });
+    document.documentElement.classList.toggle('sort-open',name === 'sort');
+    document.body.classList.toggle('is-sorting',name === 'sort');
     window.scrollTo(0,0);
   }
   const persist = () => storage.set('draft',draft);
@@ -77,42 +80,81 @@
     selected = null; persist(); renderSort();
   }
   function renderSort() {
+    const compact = matchMedia('(max-width: 700px)').matches;
+    if (wasCompact !== null && compact !== wasCompact && compact && selected) {
+      viewedGroup = draft.groups.find(g=>g.words.includes(selected))?.id ?? null;
+    }
+    wasCompact = compact;
+    if (!compact || !draft.groups.some(g=>g.id===viewedGroup)) viewedGroup = null;
     const placed = new Set(draft.groups.flatMap(g=>g.words));
     const pool = draft.order.filter(w=>!placed.has(w));
-    el('word-pool').replaceChildren(...pool.map(wordButton));
-    if (!pool.length) {
-      const note = document.createElement('p'); note.className = 'pool-empty'; note.textContent = '¡Ya ubicaste todas!';
+    const sourceGroup = compact ? draft.groups.find(g=>g.id===viewedGroup) : null;
+    const sourceKey = sourceGroup ? `group:${sourceGroup.id}` : 'pool';
+    const sourceWords = sourceGroup ? sourceGroup.words : pool;
+    const sourceScroll = el('word-pool').scrollTop;
+    el('word-pool').replaceChildren(...sourceWords.map(wordButton));
+    if (!sourceWords.length) {
+      const note = document.createElement('p'); note.className = 'pool-empty';
+      note.textContent = sourceGroup ? 'Este grupo está vacío.' : '¡Ya ubicaste todas!';
       el('word-pool').append(note);
     }
-    el('pool-count').textContent = `${pool.length} / ${CONFIG.words.length}`;
+    el('word-pool').scrollTop = sourceKey === renderedSource ? sourceScroll : 0;
+    renderedSource = sourceKey;
+    el('pool-title').textContent = sourceGroup ? `Grupo ${draft.groups.indexOf(sourceGroup)+1}` : 'Emociones por ubicar';
+    el('pool-count').textContent = sourceGroup ? `${sourceWords.length} ${sourceWords.length === 1 ? 'emoción' : 'emociones'}` : `${pool.length} / ${CONFIG.words.length}`;
+    const columns = compact ? (draft.groups.length === 3 || draft.groups.length >= 5 ? 3 : 2) : (innerWidth >= 1100 && draft.groups.length >= 3 ? 3 : 2);
+    el('groups').style.setProperty('--group-columns',columns);
+    el('groups').style.setProperty('--group-rows',Math.max(1,Math.ceil(draft.groups.length / columns)));
+    const oldScroll = new Map([...el('groups').querySelectorAll('.group-zone')].map(zone=>[zone.dataset.groupId,zone.querySelector('.word-list')?.scrollTop || 0]));
     el('groups').replaceChildren();
     draft.groups.forEach((group,index) => {
       const section = document.createElement('section'); section.className = 'group-zone';
+      section.dataset.groupId = String(group.id);
+      section.classList.toggle('viewed',compact && viewedGroup === group.id);
       section.style.setProperty('--group-color',A.PALETTE[index]);
       const header = document.createElement('div'); header.className = 'group-header';
       const target = document.createElement('button'); target.className = 'group-target'; target.type = 'button';
-      target.textContent = `Grupo ${index+1}`; target.addEventListener('click',()=>moveTo(group.id));
-      target.setAttribute('aria-label', selected ? `Poner ${selected} en el grupo ${index+1}` : `Grupo ${index+1}`);
+      const name = document.createElement('span'); name.className = 'group-name';
+      const prefix = document.createElement('span'); prefix.className = 'group-prefix'; prefix.textContent = 'Grupo ';
+      name.append(prefix,String(index+1));
+      const count = document.createElement('span'); count.className = 'group-count'; count.textContent = String(group.words.length);
+      target.append(name,count);
+      const chooseGroup = () => {
+        if (selected) moveTo(group.id);
+        else if (compact) { viewedGroup = group.id; renderSort(); }
+      };
+      target.addEventListener('click',e=> { e.stopPropagation(); chooseGroup(); });
+      target.setAttribute('aria-label', selected ? `Poner ${selected} en el grupo ${index+1}` : compact ? `Ver grupo ${index+1}, ${group.words.length} ${group.words.length === 1 ? 'emoción' : 'emociones'}` : `Grupo ${index+1}`);
       header.append(target);
       if (!group.words.length) {
         const remove = document.createElement('button'); remove.className = 'remove-group'; remove.textContent = '✕';
         remove.type = 'button'; remove.setAttribute('aria-label',`Quitar grupo ${index+1}`);
         remove.addEventListener('click',e=> {
-          e.stopPropagation(); draft.groups = draft.groups.filter(g=>g.id!==group.id); persist(); renderSort();
+          e.stopPropagation(); draft.groups = draft.groups.filter(g=>g.id!==group.id);
+          if (viewedGroup === group.id) viewedGroup = null;
+          persist(); renderSort();
         });
         header.append(remove);
       }
-      const list = document.createElement('div'); list.className = 'word-list';
-      list.append(...group.words.map(wordButton));
-      if (!group.words.length) {
-        const hint = document.createElement('span'); hint.className = 'drop-hint'; hint.textContent = 'Tocá acá para ubicarla'; list.append(hint);
+      if (compact) {
+        const preview = document.createElement('p'); preview.className = 'group-preview';
+        preview.textContent = group.words.length ? group.words.join(' · ') : 'Vacío';
+        section.append(header,preview);
+      } else {
+        const list = document.createElement('div'); list.className = 'word-list';
+        list.append(...group.words.map(wordButton));
+        if (!group.words.length) {
+          const hint = document.createElement('span'); hint.className = 'drop-hint'; hint.textContent = 'Tocá acá para ubicarla'; list.append(hint);
+        }
+        section.append(header,list);
+        list.scrollTop = oldScroll.get(String(group.id)) || 0;
       }
-      section.append(header,list); section.addEventListener('click',()=>moveTo(group.id));
+      section.addEventListener('click',chooseGroup);
       el('groups').append(section);
     });
-    el('remaining').textContent = pool.length ? `Te faltan ${pool.length} emociones` : '¡Ya ubicaste todas!';
-    el('selection-status').textContent = selected ? `Seleccionaste «${selected}». Tocá un grupo.` : 'Tocá una emoción para seleccionarla.';
-    el('btn-to-pool').disabled = !selected || !placed.has(selected);
+    el('remaining').textContent = pool.length ? pool.length === 1 ? 'Te falta 1 emoción' : `Te faltan ${pool.length} emociones` : '¡Ya ubicaste todas!';
+    el('selection-status').textContent = selected ? `«${selected}»: tocá un grupo.` : sourceGroup ? `Grupo ${draft.groups.indexOf(sourceGroup)+1}: tocá una emoción.` : compact ? 'Tocá un grupo para ver sus emociones.' : 'Tocá una emoción para seleccionarla.';
+    el('btn-to-pool').disabled = selected ? !placed.has(selected) : !sourceGroup;
     el('btn-add').disabled = draft.groups.length >= CONFIG.maxGroups;
     el('btn-done').disabled = pool.length > 0 || draft.groups.filter(g=>g.words.length).length < CONFIG.minGroups;
     el('screen-sort').classList.toggle('has-selection',!!selected);
@@ -145,7 +187,15 @@
     if (draft.groups.length >= CONFIG.maxGroups) return;
     draft.groups.push({id:draft.nextId++,words:[]}); persist(); renderSort();
   });
-  el('btn-to-pool').addEventListener('click',()=>moveTo(null));
+  el('btn-to-pool').addEventListener('click',()=> {
+    if (selected) { viewedGroup = null; moveTo(null); }
+    else { viewedGroup = null; renderSort(); }
+  });
+  let resizeTimer;
+  window.addEventListener('resize',()=> {
+    if (!draft || el('screen-sort').hidden) return;
+    clearTimeout(resizeTimer); resizeTimer = setTimeout(renderSort,100);
+  });
   el('btn-done').addEventListener('click',()=> {
     if (el('btn-done').disabled) return;
     draft.screen = 'criterion'; persist(); showScreen('criterion'); el('criterion').focus();

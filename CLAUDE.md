@@ -41,6 +41,7 @@ All UI copy is Argentine Spanish with voseo. Preserve supplied strings. Never di
 - Storage keys: `pilas:<code>:participant`, `draft`, `pending`, `submitted`.
 - Generate `crypto.randomUUID()` once per device/browser and session. Shuffle independently via Fisher–Yates; persist original order and assignment draft. Timer starts at Empezar.
 - Start with two empty groups, add one at a time up to six; remove empty groups. Never submit empty groups.
+- The sorting screen is a viewport-height board with internal word-list scrolling; keep the page itself fixed only while sorting. On screens at most 700 px wide, `viewedGroup` switches the upper list between unassigned words and one group's contents. Tapping a group with a selected word moves it; tapping without a selection opens it. On wider screens, show the pool and group contents side by side. Preserve 16 px word labels, 44 px touch targets, a visible add-group button and all group destinations within the viewport, including six groups at 360 px. Resize must preserve the assignment draft.
 - Before submitting, every configured word occurs exactly once, 2–6 nonempty groups, criterion 2–120 characters, valid word order and duration.
 - Save pending payload BEFORE requesting insert. Use INSERT only, never UPDATE/upsert. A 23505 conflict is success only after checking that this participant already has a saved row. Retain pending payload on failure.
 - On reload check local receipt, then server receipt, then retry pending data. No analysis or family hints on student pages.
