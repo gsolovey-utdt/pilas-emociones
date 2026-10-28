@@ -809,4 +809,3 @@ select { background: var(--surface-2); border: 1px solid var(--border); color: v
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
-
