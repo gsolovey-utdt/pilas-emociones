@@ -70,6 +70,14 @@ Same project and public key as two-armed-bandit, inlined in both HTML files. Nev
 - Demo uses 40 local participants, independent noisy coordinates (sd .25), social scaled .6, k uniform 3–6; nostalgia and sorpresa draw x ±.5 before noise. Drop empty groups. Stop live polling, never INSERT demo data, show permanent DATOS SIMULADOS banner. Returning restores live cache and resumes unless frozen.
 - CSV exports the current snapshot as two UTF-8 BOM files, quoted fields, spreadsheet-formula neutralization; explicit fallback links. Mark demo files in their names.
 
+## Supabase persistence — verified 2026-10-28
+
+The user executed `schema.sql` in project `irryksaoygdklwtsjsru`. Anonymous storage is now verified on the published GitHub Pages app at `https://gsolovey-utdt.github.io/pilas-emociones/`.
+
+Verification used only the public frontend key: one response was submitted through the live student UI, read back from Supabase, rejected on duplicate INSERT with HTTP 409 / PostgreSQL 23505, and correctly recognized as already submitted after reload. A concurrent API test made 120 attempts for 60 participants: 60 inserts, 60 duplicate rejections, 60 valid unique stored responses. The live projector displayed 60 with demo mode off.
+
+Test sessions were `qa-envio-20261028-f84b5f4b` and `qa-carga-20261028-f84b5f4b`, separate from all pilot/class sessions. These contain synthetic verification data. Demo mode and local `/qa/` fixtures still do not write to Supabase. The Supabase setup task is complete; do not repeat schema creation in this existing project.
+
 ## Tests and deploy
 
 Open `test.html`; all rows must PASS. Tests are reused from Node through CommonJS. Add meaningful numerical/behavioral checks for substantive changes. Check taps, pending retry, duplicate submissions, hidden results, freeze races, demo isolation, projector readability and 360 px layout when touching those paths.

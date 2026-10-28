@@ -16,6 +16,8 @@ La app usa solamente `insert` y `select`. No actualiza ni borra respuestas. La c
 
 ## Publicar en GitHub Pages
 
+**Estado verificado al 28/10/2026:** el esquema ya está creado en el proyecto configurado y el guardado desde la web publicada funciona. Se comprobó un envío real desde la interfaz, su lectura, el reconocimiento al recargar, el rechazo de duplicados y una prueba de concurrencia de 60 participantes con conteo correcto en el proyector. Los registros de verificación quedaron bajo códigos exclusivos `qa-…`, separados de las sesiones de clase. El modo demo y los enlaces locales `/qa/` conservan su funcionamiento de prueba sin escritura en Supabase.
+
 1. Creá el repositorio **`pilas-emociones`** en `gsolovey-utdt` y subí estos archivos a la raíz de la rama `main`.
 2. En **Settings → Pages → Build and deployment**, elegí **Deploy from a branch**, rama **`main`**, carpeta **`/ (root)`** y guardá.
 3. Esperá a que termine la publicación. La dirección será `https://gsolovey-utdt.github.io/pilas-emociones/`.
